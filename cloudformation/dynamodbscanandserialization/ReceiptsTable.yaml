@@ -123,7 +123,7 @@ Resources:
       Role:
         Fn::GetAtt: [ LambdaRole , "Arn" ]
       # 2020-02-27: [bp] updated from nodejs10.x in case it matters
-      Runtime: nodejs12.x
+      Runtime: nodejs16.x
       Timeout: 60
   InitializeReceiptsTable:
     Type: Custom::InitFunction
