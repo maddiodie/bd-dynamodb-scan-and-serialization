@@ -41,8 +41,9 @@ public class ReceiptDao {
         Receipt receipt = new Receipt();
         receipt.setCustomerId(customerId);
         receipt.setPurchaseDate(ZonedDateTime.now());
-        receipt.setSalesTotal(sundaeList.stream().map(Sundae::getPrice).reduce(BigDecimal.ZERO, BigDecimal::add));
-
+        receipt.setSalesTotal(sundaeList.stream().map(Sundae::getPrice)
+                .reduce(BigDecimal.ZERO, BigDecimal::add));
+        receipt.setSundaes(sundaeList);
         mapper.save(receipt);
         return receipt;
     }
@@ -58,9 +59,10 @@ public class ReceiptDao {
     }
 
     /**
-     * Retrieves a subset of the receipts stored in the database. At least limit number of records will be retrieved
-     * unless the end of the table has been reached, and instead only the remaining records will be returned. An
-     * exclusive start key can be provided to start reading the table from this record, but excluding it from results.
+     * Retrieves a subset of the receipts stored in the database. At least limit number of records
+     * will be retrieved unless the end of the table has been reached, and instead only the remaining
+     * records will be returned. An exclusive start key can be provided to start reading the table
+     * from this record, but excluding it from results.
      * @param limit - the number of Receipts to return
      * @param exclusiveStartKey - an optional value provided to designate the start of the read
      * @return a list of Receipts
@@ -68,4 +70,5 @@ public class ReceiptDao {
     public List<Receipt> getReceiptsPaginated(int limit, Receipt exclusiveStartKey) {
         return Collections.emptyList();
     }
+
 }
