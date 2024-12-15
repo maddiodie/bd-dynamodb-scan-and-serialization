@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 public class Phase1Test {
+
     private static final IceCreamParlorServiceComponent DAGGER = DaggerIceCreamParlorServiceComponent.create();
     private static final List<String> ONE_SCOOP = ImmutableList.of("Chocolate");
     private static final List<String> TWO_SCOOPS = ImmutableList.of("Chocolate", "Chocolate");
@@ -81,4 +82,5 @@ public class Phase1Test {
         assertTrue(result.compareTo(totalSales) >= 0, String.format("Expected sales to total at least the " +
             "value of the two sundaes created by this test: %s, but was: %s.", totalSales, result));
     }
+
 }

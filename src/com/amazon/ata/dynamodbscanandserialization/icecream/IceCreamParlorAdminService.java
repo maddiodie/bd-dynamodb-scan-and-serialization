@@ -13,6 +13,7 @@ import javax.inject.Inject;
  * Provides Ice Cream Parlor admin functionality.
  */
 public class IceCreamParlorAdminService {
+
     private final ReceiptDao receiptDao;
 
     /**
@@ -31,7 +32,7 @@ public class IceCreamParlorAdminService {
      * @return the total amount of sales during the time period
      */
     public BigDecimal getSalesForTimePeriod(final ZonedDateTime fromDate, final ZonedDateTime toDate) {
-        return new BigDecimal(-1);
+        return receiptDao.getSalesBetweenDates(fromDate, toDate);
     }
 
     /**
@@ -42,10 +43,11 @@ public class IceCreamParlorAdminService {
      * @param limit the number of Receipts to be retrieved
      * @param exclusiveStartReceipt the starting location to retrieve results, null should be provided
      *                              to start at the beginning
-     * @return a list of Receipts of size limit or less than limit if the end of the receipts has been reached
+     * @return a list of Receipts of size limit or less than limit if the end of the receipts has been
+     *         reached
      */
     public List<Receipt> getCustomerReceipts(final int limit, final Receipt exclusiveStartReceipt) {
-        return Collections.emptyList();
+        return receiptDao.getReceiptsPaginated(limit, exclusiveStartReceipt);
     }
 
 }

@@ -25,7 +25,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 public class Phase2Test {
-    private static final IceCreamParlorServiceComponent DAGGER = DaggerIceCreamParlorServiceComponent.create();
+
+    private static final IceCreamParlorServiceComponent DAGGER = DaggerIceCreamParlorServiceComponent
+            .create();
     private static final List<String> ONE_SCOOP = ImmutableList.of("Chocolate");
     private static final List<String> TWO_SCOOPS = ImmutableList.of("Chocolate", "Chocolate");
 
@@ -80,7 +82,10 @@ public class Phase2Test {
         totalResults.addAll(tempResults);
 
         // THEN
-        assertTrue(totalResults.contains(receipt1), "Expected results to contain receipt: " + receipt1);
-        assertTrue(totalResults.contains(receipt2), "Expected results to contain receipt: " + receipt2);
+        assertTrue(totalResults.contains(receipt1), "Expected results to contain receipt: "
+                + receipt1);
+        assertTrue(totalResults.contains(receipt2), "Expected results to contain receipt: "
+                + receipt2);
     }
+
 }

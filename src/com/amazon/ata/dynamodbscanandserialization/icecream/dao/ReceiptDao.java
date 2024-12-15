@@ -4,12 +4,15 @@ import com.amazon.ata.dynamodbscanandserialization.icecream.converter.ZonedDateT
 import com.amazon.ata.dynamodbscanandserialization.icecream.model.Receipt;
 import com.amazon.ata.dynamodbscanandserialization.icecream.model.Sundae;
 
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
+import com.amazonaws.services.dynamodbv2.datamodeling.*;
+import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.inject.Inject;
 
 /**
@@ -55,8 +58,28 @@ public class ReceiptDao {
      * @return the total values of sundae sales for the requested time period
      */
     public BigDecimal getSalesBetweenDates(ZonedDateTime fromDate, ZonedDateTime toDate) {
-        return new BigDecimal(-1);
+        Map<String, AttributeValue> valueMap = new HashMap<>();
+        // (1)
+        valueMap.put(":startDate", new AttributeValue().withS(converter.convert(fromDate)));
+        valueMap.put(":endDate", new AttributeValue().withS(converter.convert(toDate)));
+        DynamoDBScanExpression scanExpression = new DynamoDBScanExpression()
+                .withFilterExpression("purchaseDate between :startDate and :endDate")
+                .withExpressionAttributeValues(valueMap);
+        // (2)
+
+        PaginatedScanList<Receipt> result = mapper.scan(Receipt.class, scanExpression);
+
+        return result.stream()
+                .map(Receipt::getSalesTotal)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        // (3)
     }
+    // plan
+    // (1) create a map to hold the start and end date
+    // (2) build a scan expression with a filter between the start and end date using the values from
+    //     the map
+    // (3) return the resulting stream, mapping over each sale to get the sales total, and reduce this
+    //     to be a single big decimal value
 
     /**
      * Retrieves a subset of the receipts stored in the database. At least limit number of records
@@ -68,7 +91,33 @@ public class ReceiptDao {
      * @return a list of Receipts
      */
     public List<Receipt> getReceiptsPaginated(int limit, Receipt exclusiveStartKey) {
-        return Collections.emptyList();
+        DynamoDBScanExpression scanExpression = new DynamoDBScanExpression().withLimit(limit);
+        // (1)
+
+        if (exclusiveStartKey != null) {
+            Map<String, AttributeValue> startingKeyMap = new HashMap<>();
+            startingKeyMap.put("customerId", new AttributeValue()
+                    .withS(exclusiveStartKey.getCustomerId()));
+            // (2)
+            startingKeyMap.put("purchaseDate", new AttributeValue()
+                    .withS(converter.convert(exclusiveStartKey.getPurchaseDate())));
+            // (3)
+            scanExpression.setExclusiveStartKey(startingKeyMap);
+        }
+
+        ScanResultPage<Receipt> receiptPage = mapper.scanPage(Receipt.class, scanExpression);
+        // (4)
+
+        return receiptPage.getResults();
+        // (5)
     }
+    // plan
+    // (1) build a scan expression with limit
+    // (2) as long as there is an exclusive starting key, then we can create a starting key map to
+    //     hold the customer id and the purchase date
+    // (3) set the scan expression exclusive starting key
+    // (4) create a receipt page by using the scanPage() method from mapper passing in the class and
+    //     scan expression
+    // (5) return the results from the receipt page
 
 }
